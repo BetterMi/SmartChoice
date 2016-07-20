@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, AlertType) {
 @interface ViewController () <UIWebViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *defaultWebView;
+@property (assign, nonatomic) BOOL firstLoadSuccess;
 
 @end
 
@@ -34,10 +35,12 @@ typedef NS_ENUM(NSInteger, AlertType) {
 #pragma mark - webview delegate
 
 - (void)webViewDidStartLoad:(UIWebView *)webView {
+    [self showBlank:NO message:nil withFrame:CGRectZero];
     [self showWait:@"正在加载..."];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
+    self.firstLoadSuccess = YES;
     [self showBlank:NO message:nil withFrame:CGRectZero];
     [self hideWait];
 }
@@ -45,7 +48,9 @@ typedef NS_ENUM(NSInteger, AlertType) {
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     [self hideWait];
     [self alert:@"加载失败!" alertType:AlertTypeFail];
-    [self showBlank:YES message:@"点击屏幕重新加载" withFrame:self.view.frame];
+    if (!self.firstLoadSuccess) {
+        [self showBlank:YES message:@"点击屏幕重新加载" withFrame:self.view.frame];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
